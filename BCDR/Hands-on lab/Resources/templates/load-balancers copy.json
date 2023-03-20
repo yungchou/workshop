@@ -28,14 +28,14 @@
     }
   },
   "variables": {
-    "InternalLoadBalancerName": "[concat('ContosoSqlLB-', parameters('Environment'))]",
-    "ExternalLoadBalancerName": "[concat('ContosoWebLB-', parameters('Environment'))]",
+    "InternalLoadBalancerName": "[concat('ContosoSQLLB', parameters('Environment'))]",
+    "ExternalLoadBalancerName": "[concat('ContosoWebLB', parameters('Environment'))]",
     "FrontEndName": "FrontEnd1",
     "RuleName": "Rule1",
     "BackEndPoolName": "BackEndPool1",
     "ProbeName": "Probe1",
-    "ExternalLoadBalancerPublicIPName": "[concat(variables('ExternalLoadBalancerName'), '-IP')]",
-    "ExternalLoadBalancerPublicIPDNSName": "[concat(parameters('WebLBDnsLabelPrefix'), take(uniqueString(resourceGroup().id), 2)]"
+    "ExternalLoadBalancerPublicIPName": "[concat(variables('ExternalLoadBalancerName'), 'IP')]",
+    "ExternalLoadBalancerPublicIPDNSName": "[concat(parameters('WebLBDnsLabelPrefix'), take(uniqueString(resourceGroup().id), 4))]"
   },
   "resources": [
     {
@@ -71,7 +71,7 @@
       "properties": {
         "frontendIPConfigurations": [
           {
-            "name": "[variables('FrontEndName')]", 
+            "name": "[variables('FrontEndName')]",
             "properties": {
               "publicIPAddress": {
                 "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('ExternalLoadBalancerPublicIPName'))]"
