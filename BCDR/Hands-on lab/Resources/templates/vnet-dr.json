@@ -17,15 +17,15 @@
     }
   },
   "variables": {
-    "NSGName": "AppsNSG",
-    "NATName": "[concat(parameters('VNetName'), 'NAT')]",
-    "NATIPName": "[concat(variables('NATName'), 'IP')]",
+    "NSGName": "appsNSG",
+    "NATName": "[concat(parameters('VNetName'), '-NAT')]",
+    "NATIPName": "[concat(variables('NATName'), '-IP')]",
     "VNetPrefix": "10.1.0.0/16",
-    "AppsSubnetName": "Apps",
+    "AppsSubnetName": "apps",
     "AppsSubnetPrefix": "10.1.1.0/24",
-    "DataSubnetName": "Data",
+    "DataSubnetName": "data",
     "DataSubnetPrefix": "10.1.2.0/24",
-    "ADSubnetName": "Identity",
+    "ADSubnetName": "identity",
     "ADSubnetPrefix": "10.1.3.0/24",
     "BastionSubnetName": "AzureBastionSubnet",
     "BastionSubnetPrefix": "10.1.4.0/24"
@@ -39,7 +39,7 @@
       "properties": {
         "securityRules": [
           {
-            "name": "Allow-Web",
+            "name": "HTTP-Inbound",
             "properties": {
               "protocol": "Tcp",
               "sourcePortRange": "*",
