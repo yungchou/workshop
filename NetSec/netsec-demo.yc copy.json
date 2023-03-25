@@ -1,5 +1,5 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
     "DefaultUserName": {
@@ -16,9 +16,16 @@
         "description": "Password for the Builtin Administrator account. "
       }
     },
+    "DiagnosticsWorkspaceResourceGroup": {
+      "type": "string",
+      "defaultValue": "NetSec",
+      "metadata": {
+        "description": "Provide the workspace resourcegroupname for your Network Diagnostic logs"
+      }
+    },
     "DiagnosticsWorkspaceName": {
       "type": "string",
-      "defaultValue": "netsec-workspace",
+      "defaultValue": "<existingDiagnosticsWorkspaceName",
       "metadata": {
         "description": "Provide an EXISTING workspace name for your Network Diagnostic logs"
       }
@@ -27,14 +34,7 @@
       "type": "string",
       "defaultValue": "<WorkspaceSubscriptionID>",
       "metadata": {
-        "description": "Provide the EXISTING workspace subscription GUID for your Network Diagnostic logs"
-      }
-    },
-    "DiagnosticsWorkspaceResourceGroup": {
-      "type": "string",
-      "defaultValue": "NetSec",
-      "metadata": {
-        "description": "Provide the workspace resourcegroupname for your Network Diagnostic logs"
+        "description": "Provide the workspace subscription GUID for your Network Diagnostic logs"
       }
     },
     "DDOSProtectionConfiguration": {
@@ -47,14 +47,26 @@
       "metadata": {
         "description": "Allowing the ability to enable or disable DDoS on deployment, false is disable, true is enable"
       }
+    },
+    "nametag":{
+      "type":"string",
+      "defaultValue":"[utcNow('ss')]",
+      "metadata":{
+          "description":"tag to make the deployed resource names unique",
+          "hideInput": true
+      }
     }
   },  
   "variables": {
-    "VN-Name1": "netsec-vnet-Hub",
-    "VN-Name2": "netsec-vnet-Spoke1",
-    "VN-Name3": "netsec-vnet-Spoke2",
+/*    "ADDomainName": "[split(parameters('domainName'),'.')[0]]",
+*/    "stub": "[string(parameters('nametag'))]",
+    "vnetName": "[concat(variables('stub'),'-vnet-',resourceGroup().location)]",
+
+    "VN-Name1": "[concat('netsec-vnet',variables('stub'),'-Hub')]",
+    "VN-Name2": "[concat('netsec-vnet',variables('stub'),'-Spoke1')]",
+    "VN-Name3": "[concat('netsec-vnet',variables('stub'),'Spoke2')]",
     "VN-Name1Prefix": "10.0.25.0/24",
-    "VN-Name1Subnet1Name": "AGWAFSubnet",
+    "VN-Name1Subnet1Name": "AGWAF-subnet",
     "VN-Name1Subnet1Prefix": "10.0.25.64/26",
     "VN-Name1Subnet2Name": "AzureFirewallSubnet",
     "VN-Name1Subnet2Prefix": "10.0.25.0/26",
@@ -88,31 +100,31 @@
         "service": "Microsoft.AzureActiveDirectory"
       }
     ],
-    "publicIpAddressName1": "SOCNSFWPIP",
-    "publicIpAddressName2": "SOCNSAGPIP",
-    "FW-name": "SOC-NS-FW",
-    "firewallPolicyName": "SOC-NS-FWPolicy",
-    "AppGatewayPolicyName": "SOC-NS-AGPolicy",
-    "FrontdoorPolicyName": "SOCNSFDPolicy",
-    "AG-Name": "SOC-NS-AG-WAFv2",
+    "publicIpAddressName1": "[concat('AFW-PIP',variables('stub'))]",
+    "publicIpAddressName2": "[concat('AGW-PIP',variables('stub'))]",
+    "FW-name": "[concat('AFW',variables('stub'))]",
+    "firewallPolicyName": "[concat('AFWpolicy',variables('stub'))]",
+    "AppGatewayPolicyName": "[concat('AGWpolicy',variables('stub'))]",
+    "FrontdoorPolicyName": "[concat('AFDpolicy',variables('stub'))]",
+    "AG-Name": "[concat('AGW-WAFv2-',variables('stub'))]",
     "AppGateway_IPAddress": "10.0.25.70",
     "applicationGatewayId": "[resourceId('Microsoft.Network/applicationGateways', variables('AG-Name'))]",
-    "FrontDoorName": "[concat('Demowasp','-', uniqueString(resourceGroup().id))]",
-    "RT-Name1": "SOC-NS-DEFAULT-ROUTE",
-    "NSG-Name1": "SOC-NS-NSG-SPOKE1",
-    "NSG-Name2": "SOC-NS-NSG-SPOKE2",
-    "Site-Name1": "[concat('owaspdirect','-', uniqueString(resourceGroup().id))]",
-    "Site-HPN": "OWASP-ASP",
+    "FrontDoorName": "[concat('fd2WASP',variables('stub'))]",
+    "RT-Name1": "[concat('default-route-',variables('stub'))]",
+    "NSG-Name1": "[concat('NSG-spoke1-',variables('stub'))]",
+    "NSG-Name2": "[concat('NSG-spoke2-',variables('stub'))]",
+    "Site-Name1": "[concat('direct2WASP',variables('stub'))]",
+    "Site-HPN": "[concat('OWASP-ASP',variables('stub'))]",
     "NIC-Name1": "nic1",
     "NIC-Name2": "nic2",
     "NIC-Name3": "nic3",
     "NIC-Name1Ipaddress": "10.0.27.4",
     "NIC-Name2Ipaddress": "10.0.27.68",
     "NIC-Name3Ipaddress": "10.0.28.4",
-    "DDoSPlanName": "SOCNSDDOSPLAN",
-    "VM-Name1": "netsec-Win11",
-    "VM-Name2": "netsec-Kali",
-    "VM-Name3": "netsec-Win2019",
+    "DDoSPlanName": "[concat('DDOS-plan',variables('stub'))]",
+    "VM-Name1": "[concat('netsec',variables('stub'),'-Win11')]",
+    "VM-Name2": "[concat('netsec',variables('stub'),'-Kali')]",
+    "VM-Name3": "[concat('netsec',variables('stub'),'-WS2019')]",
     "workspaceid": "[concat('/subscriptions/',parameters('DiagnosticsWorkspaceSubscription'),'/resourcegroups/', parameters('DiagnosticsWorkspaceResourceGroup'), '/providers/Microsoft.OperationalInsights/workspaces/',parameters('DiagnosticsWorkspaceName'))]"
   },
   "resources": [
@@ -328,7 +340,7 @@
     {
       "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
       "apiVersion": "2020-04-01",
-      "name": "[concat(variables('VN-Name1'), '/', variables('VN-Name1'), '-Peering-To-', variables('VN-NAME2'))]",
+      "name": "[concat(variables('VN-Name1'), '/', variables('VN-Name1'), '-peering',variables('stub'), variables('VN-NAME2'))]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/virtualNetworks', variables('VN-Name1'))]",
         "[resourceId('Microsoft.Network/virtualNetworks', variables('VN-Name2'))]",
@@ -355,7 +367,7 @@
     {
       "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
       "apiVersion": "2020-04-01",
-      "name": "[concat(variables('VN-Name1'), '/', variables('VN-Name1'), '-peering-To-', variables('VN-NAME3'))]",
+      "name": "[concat(variables('VN-Name1'), '/', variables('VN-Name1'), '-peering',variables('stub'), variables('VN-NAME3'))]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/virtualNetworks', variables('VN-Name1'))]",
         "[resourceId('Microsoft.Network/virtualNetworks', variables('VN-Name2'))]",
@@ -382,7 +394,7 @@
     {
       "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
       "apiVersion": "2020-04-01",
-      "name": "[concat(variables('VN-Name2'), '/', variables('VN-Name2'), '-peering-To-', variables('VN-NAME1'))]",
+      "name": "[concat(variables('VN-Name2'), '/', variables('VN-Name2'), '-peering',variables('stub'), variables('VN-NAME1'))]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/virtualNetworks', variables('VN-Name1'))]",
         "[resourceId('Microsoft.Network/virtualNetworks', variables('VN-Name2'))]",
@@ -409,7 +421,7 @@
     {
       "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
       "apiVersion": "2020-04-01",
-      "name": "[concat(variables('VN-Name3'), '/', variables('VN-Name3'), '-peering-To-', variables('VN-NAME1'))]",
+      "name": "[concat(variables('VN-Name3'), '/', variables('VN-Name3'), '-peering',variables('stub'),'-', variables('VN-NAME1'))]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/virtualNetworks', variables('VN-Name1'))]",
         "[resourceId('Microsoft.Network/virtualNetworks', variables('VN-Name2'))]",
