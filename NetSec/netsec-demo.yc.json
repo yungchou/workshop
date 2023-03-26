@@ -58,10 +58,8 @@
     }
   },  
   "variables": {
-/*    "ADDomainName": "[split(parameters('domainName'),'.')[0]]",
-*/    "stub": "[string(parameters('nametag'))]",
-    "vnetName": "[concat(variables('stub'),'-vnet-',resourceGroup().location)]",
-
+    /*"ADDomainName": "[split(parameters('domainName'),'.')[0]]",
+    */"stub": "[string(parameters('nametag'))]",
     "VN-Name1": "[concat('netsec-vnet',variables('stub'),'-Hub')]",
     "VN-Name2": "[concat('netsec-vnet',variables('stub'),'-Spoke1')]",
     "VN-Name3": "[concat('netsec-vnet',variables('stub'),'Spoke2')]",
